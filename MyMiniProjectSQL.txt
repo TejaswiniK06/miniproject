@@ -1,0 +1,208 @@
+
+Use TejaswinidB
+
+create schema [46009966]
+go
+create table [46009966].CIMSCar(
+Id INT NOT NULL IDENTITY(1,1),
+Model varchar(50) unique,
+ManufacturerId int ,
+TypeId int Foreign Key  (TypeId) REFERENCES [46009966].CISCarType(Id),
+Engine varchar(50),
+BHP int,
+TransmissionId int Foreign Key  (transmissionId) REFERENCES [46009966].CISCarTransmissionType(Id),
+Mileage int not null,
+Seat int not null,
+AirBagDetails varchar(20) not null,
+BootSpace varchar(20) not null,
+Price varchar(20) not null);
+--foreign key
+
+ALTER TABLE [46009966].CIMSCar  WITH CHECK 
+ADD CONSTRAINT [FK_CIMSCar_ManufacturerId] FOREIGN KEY(ManufacturerId)
+REFERENCES [46009966].CISManufacturer (Id)
+ON DELETE CASCADE
+GO
+
+insert into [46009966].CIMSCar   values('Maisto',1,1,'4.6L',60,1,45,4,'Driver & front seat','400L',50000);
+
+insert into [46009966].CIMSCar   values('Presso',2,2,'5.6L',50,1,55,5,'Driver','500L',50000);
+insert into [46009966].CIMSCar   values('Rover',3,3,'7.6L',40,2,65,5,'Driver','500L',50000);
+
+
+
+select * from [46009966].CIMSCar
+
+
+drop table [46009966].CIMSCar
+
+drop table [46009966].CISManufacturer
+
+create  table [46009966].CISManufacturer
+(Id int primary key ,
+ManufacturerName varchar(50) unique,
+ContactPerson varchar(50) unique,
+RegisteredOffice varchar(50) not null)
+
+
+create table [46009966].CISCarType
+(Id int primary key identity(1,1),
+carType varchar(20) unique);
+
+drop table [46009966].CISCarType
+
+
+create table [46009966].CISCarTransmissionType
+(
+Id int primary key identity(1,1),
+TransmissionName varchar(20) unique);
+
+drop table [46009966].CISCarTransmissionType
+
+CREATE SEQUENCE  ManufactureIdSequence AS INT
+ START WITH 100
+ INCREMENT BY 1
+GO
+
+drop proc [46009966].usp_CIMS_Insert
+
+create procedure [46009966].usp_CIMS_Insert
+(
+	@Model varchar(50),
+	@Engine varchar(50),
+	@BHP int,
+	@Mileage int,
+	@Seat int,
+	@AirBagDetails varchar(50),
+	@BootSpace varchar(50),
+	@Price int,
+	@ManufacturerName varchar(50),
+	@ContactPerson varchar(50),
+	@RegisteredOffice varchar(50),
+	@CarType varchar(50),
+	@TransmissionType varchar(50)
+)
+As
+begin
+
+
+insert into [46009966].CISManufacturer values (next value for ManufactureIdSequence,@ManufacturerName,@ContactPerson,@RegisteredOffice)
+insert into [46009966].CIMSCar (Model,ManufacturerId,TypeId,Engine,BHP,TransmissionId,Mileage,Seat,AirBagDetails,BootSpace,Price) values (@Model,(select Id from [46009966].CISManufacturer where @ManufacturerName=ManufacturerName),
+(select Id from [46009966].CISCarType where @CarType=carType),@Engine,@BHP,
+(select Id from [46009966].CISCarTransmissionType where @TransmissionType=TransmissionName),@Mileage,@Seat,@AirBagDetails,@BootSpace,@Price)
+end
+ 
+GO 
+
+
+exec [46009966].usp_CIMS_Insert  @Model='Bentley',@Engine ='5.6L',@BHP=50,@Mileage=10,@Seat=4,@AirBagDetails='driver',@BootSpace='400L',@Price=1000,@ManufacturerName='swift',@ContactPerson='Kirans',@RegisteredOffice='Pune',@CarType='SUV',@TransmissionType='Automatic'
+
+ select * from [46009966].CISManufacturer;
+
+ drop table [46009966].CISManufacturer
+
+ insert into [46009966].CISManufacturer values(1,'Audi','Kiran','Pune')
+ insert into [46009966].CISManufacturer values(2,'BMW','Raj','Mumbai')
+ insert into [46009966].CISManufacturer values(3,'Benz','Srikanth','Hyderabad')
+ insert into [46009966].CISManufacturer values(4,'Hyundai','Suresh','Bangalore')
+ insert into [46009966].CISManufacturer values(5,'Suzuki','Ramesh','Chennai')
+  insert into [46009966].CISManufacturer values(6,'Volkswagon','Karthik','Vijayawada')
+
+  select * from [46009966].CISCarType;
+ insert into [46009966].CISCarType values ('HatchBack');
+ insert into [46009966].CISCarType values ('Sedan');
+ insert into [46009966].CISCarType values ('SUV');
+
+ select * from [46009966].CISCarTransmissionType;
+ insert into [46009966].CISCarTransmissionType values('Automatic');
+ insert into [46009966].CISCarTransmissionType values('Manual');
+
+ DBCC DROPCLEANBUFFERS
+GO
+ create procedure [46009966].usp_deletecar
+
+	@Model varchar(50)
+
+AS begin 
+   DELETE FROM [46009966].CISManufacturer WHERE Id IN
+   (SELECT ManufacturerId FROM [46009966].CIMSCar WHERE Model = @Model ) 
+   
+delete from [46009966].CIMSCar where Model = @Model
+ 
+end
+go
+
+drop procedure [46009966].usp_deletecar
+
+exec [46009966].usp_deletecar 'Bentley'
+
+
+create procedure [46009966].usp_CIMSupdate
+(
+	@Model varchar(50),
+	@Engine varchar(50),
+	@BHP int,
+	@Mileage int,
+	@Seat int,
+	@AirBagDetails varchar(50),
+	@BootSpace varchar(50),
+	@Price int,
+	@ManufacturerName varchar(50),
+	@ContactPerson varchar(50),
+	@RegisteredOffice varchar(50),
+	
+	@TypeId int,
+	@TransmissionId int,
+	@CarType varchar(50),
+	@TransmissionType varchar(50)
+)
+as
+begin
+update [46009966].CIMSCar
+
+set Engine=@Engine,BHP=@BHP,Mileage=@Mileage,Seat=@Seat,AirBagDetails=@AirBagDetails,BootSpace=@BootSpace,Price=@Price,@TypeId=(select Id from [46009966].CISCarType where carType=@CarType),@TransmissionId=(select Id from [46009966].CISCarTransmissionType where TransmissionName=@TransmissionType)
+where Model=@Model
+
+update [46009966].CISManufacturer
+set ManufacturerName=@ManufacturerName,ContactPerson=@ContactPerson,RegisteredOffice=@RegisteredOffice
+where Id=(select ManufacturerId from [46009966].CIMSCar where Model=@Model)
+end
+
+exec [46009966].usp_CIMSupdate 'Presso','5.6L',40,60, 5, 'Driver & front seat','400L',60000,'Maruti','Rameshwar','Tirupathi',1,1,'SUV','Automatic'
+
+drop proc  [46009966].usp_CIMSupdate 
+
+
+create procedure [46009966].usp_SearchCarDetails
+(
+	@Model varchar(50)
+)
+As
+begin
+select * from [46009966].CIMSCar a, [46009966].CISManufacturer b 
+where a.Model=@Model and b.Id =a.ManufacturerId
+end
+
+exec [46009966].usp_SearchCarDetails 'Presso'
+
+drop proc  [46009966].usp_SearchCarDetails
+
+create procedure [46009966].usp_ListAll
+(
+	@ManufacturerName varchar(50),
+	@CarType varchar(50)
+)
+As
+Begin
+--select * from Car_46004683 where ((ManufacturerId=(select ID from Manufacturer_46004683 where ManufacturerName=@ManufacturerName))and(TypeId=(select ID from CarType_46004683 where CarType=@CarType)))
+--select * from Manufacturer_46004683 where ManufacturerName=@ManufacturerName
+
+
+
+select * from [46009966].CIMSCar FULL OUTER JOIN [46009966].CISManufacturer on ((ManufacturerId=(select Id from [46009966].CISManufacturer where ManufacturerName=@ManufacturerName))and(TypeId=(select Id from [46009966].CISCarType where carType=@CarType)))
+where ManufacturerName=@ManufacturerName
+
+end
+
+exec [46009966].usp_ListAll 'Maruti','Sedan'
+
