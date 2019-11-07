@@ -1,0 +1,113 @@
+ALTER procedure [dbo].[CIMSdelete_46004683]
+(
+	@Model varchar(50)
+)
+AS
+begin 
+delete from Manufacturer_46004683 where ID=(select ManufacturerId from Car_46004683 where @Model=Model)
+delete from Car_46004683 where @Model=Model
+end
+
+ALTER procedure [dbo].[CIMSsearch_46000150]
+(
+	@Model varchar(50)
+)
+As
+begin
+select * from Car_46000150 a, Manufacturer_46000150 b 
+where a.Model=@Model and b.ID=a.ManufacturerId
+end
+
+ALTER procedure [dbo].[CIMSlist_46004683]
+(
+	@ManufacturerName varchar(50),
+	@CarType varchar(50)
+)
+As
+Begin
+--select * from Car_46004683 where ((ManufacturerId=(select ID from Manufacturer_46004683 where ManufacturerName=@ManufacturerName))and(TypeId=(select ID from CarType_46004683 where CarType=@CarType)))
+--select * from Manufacturer_46004683 where ManufacturerName=@ManufacturerName
+
+
+
+select * from Car_46004683 FULL OUTER JOIN Manufacturer_46004683 on ((ManufacturerId=(select ID from Manufacturer_46004683 where ManufacturerName=@ManufacturerName))and(TypeId=(select ID from CarType_46004683 where CarType=@CarType)))
+where ManufacturerName=@ManufacturerName
+
+end
+
+
+ALTER procedure [dbo].[CIMSupdate_46004683]
+(
+	@Model varchar(50),
+	@Engine varchar(50),
+	@BHP int,
+	@Milage int,
+	@Seat int,
+	@AirBagDetails varchar(50),
+	@BootSpace int,
+	@Price int,
+	@ManufacturerName varchar(50),
+	@ContactPerson varchar(50),
+	@RegisteredOffice varchar(50),
+	@CarType varchar(50),
+	@TransmissionType varchar(50)
+)
+as
+begin
+update Car_46004683
+set Engine=@Engine,BHP=@BHP,Milage=@Milage,Seat=@Seat,AirbagDetails=@AirBagDetails,BootSpace=@BootSpace,Price=@Price,TypeId=(select ID from CarType_46004683 where CarType=@CarType),TransmissionId=(select ID from CarTransmissionType_46004683 where TransmissionName=@TransmissionType)
+where @Model=Model
+
+update Manufacturer_46004683
+set ManufacturerName=@ManufacturerName,ContactPerson=@ContactPerson,RegisteredOffice=@RegisteredOffice
+where (select ManufacturerId from Car_46004683 where @Model=Model)=ID
+end
+
+
+ALTER procedure [dbo].[CIMSdelete_46004683]
+(
+	@Model varchar(50)
+)
+AS
+begin 
+delete from Manufacturer_46004683 where ID=(select ManufacturerId from Car_46004683 where @Model=Model)
+delete from Car_46004683 where @Model=Model
+end
+
+
+
+ALTER procedure [dbo].[CIMS_Insert_46004309]
+(
+	@Model varchar(50),
+	@Engine varchar(50),
+	@BHP int,
+	@Mileage int,
+	@Seat int,
+	@AirBagDetails varchar(50),
+	@BootSpace int,
+	@Price int,
+	@ManufacturerName varchar(50),
+	@ContactPerson varchar(50),
+	@RegisteredOffice varchar(50),
+	@CarType varchar(50),
+	@TransmissionType varchar(50)
+)
+As
+begin
+insert into CIMS_Manufacturer_46004309 values (next value for ManufacturerIDSequence,@ManufacturerName,@ContactPerson,@RegisteredOffice)
+insert into CIMS_Car_46004309 (Model,ManufacturerId,CarTypeId,Engine,BHP,TransmissionId,Mileage,Seat,AirbagDetails,BootSpace,Price) values (@Model,(select ID from CIMS_Manufacturer_46004309 where @ManufacturerName=ManufacturerName),(select ID from CIMS_CarType_46004309 where @CarType=CarType),@Engine,@BHP,(select ID from CIMS_TransmissionType_46004309 where @TransmissionType=TransmissionName),@Mileage,@Seat,@AirBagDetails,@BootSpace,@Price)
+end
+
+
+ALTER procedure [dbo].[CIMS_ListAll_46004318]
+(
+	@ManufacturerName varchar(50),
+	@CarType varchar(50)
+)
+As
+Begin
+select * from CIMS_Car_46004318 FULL OUTER JOIN CIMS_Manufacturer_46004318 on ((ManufacturerId=(select ID from CIMS_Manufacturer_46004318 where ManufacturerName=@ManufacturerName))and(CarTypeId=(select ID from CIMS_CarType_46004318 where CarType=@CarType)))
+where ManufacturerName=@ManufacturerName
+end
+ select * from CIMS_Manufacturer_46004318
+exec [dbo].[CIMS_ListAll_46004318] 'Tata','SUV'
