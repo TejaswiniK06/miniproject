@@ -1,0 +1,284 @@
+use Training_19Sep19_Chennai
+go
+
+create table [46009966].Car(
+Id INT NOT NULL IDENTITY(1,1),
+Model varchar(50) unique,
+ManufacturerId int,
+TypeId int,
+Engine varchar(50),
+BHP int,
+TransmissionId int,
+Mileage int not null,
+Seat int not null,
+AirBagDetails varchar(20) not null,
+BootSpace varchar(20) not null,
+Price varchar(20) not null);
+
+drop table [46009966].Car
+drop table [46009966].Manufacturer
+create  table [46009966].Manufacturer
+(Id int primary key ,
+Name varchar(50) unique,
+ContactPerson varchar(50) unique,
+RegisteredOffice varchar(50) not null);
+
+create table [46009966].CarType
+(Id int primary key identity(1,1),
+Type varchar(20) unique);
+
+drop table   [46009966].CarType
+
+create table [46009966].CarTransmissionType
+(
+Id int primary key identity(1,1),
+Name varchar(20) unique);
+
+drop table [46009966].CarTransmissionType
+
+select * from [46009966].Car
+
+drop proc [46009966].InsertCar
+
+create proc [46009966].Insertopop
+ 
+ @Model varchar(50),
+  @ManufacturerId VARCHAR(10),
+  @TypeId int,
+  @Engine varchar(50),
+  @BHP int,
+  @TransmissionId int,
+  @Mileage int,
+  @Seat int,
+  @AirBag varchar(20),
+  @BootSpace varchar(20),
+  @Price varchar(20)
+
+AS
+BEGIN
+		INSERT INTO [46009966].Car
+		(Model ,ManufacturerId ,TypeId ,Engine ,BHP ,TransmissionId ,Mileage ,Seat ,AirBagDetails ,BootSpace ,Price )
+		VALUES
+		(@Model , @ManufacturerId, @TypeId ,@Engine ,@BHP ,@TransmissionId ,@Mileage ,@Seat ,@AirBag ,@BootSpace , @Price )
+		
+	END
+	
+go
+
+exec [46009966].Insertopop 'Oppo','1','1','5.6L',10,1,50,4,'kop','opp','9090'
+
+insert into [46009966].Car values ('K10',1,1,'4.6L',78,1,56,4,'Driver','400 litres',100000)
+
+create proc [46009966].GetManufacturer
+as
+begin 
+select * from [46009966].Manufacturer
+end
+go
+
+exec [46009966].GetManufacturer
+
+create proc [46009966].GetCarType
+as
+begin 
+select * from [46009966].CarType
+end
+go
+--exec [46009966].GetCarType
+create proc [46009966].GetTransmission
+as
+begin 
+select * from [46009966].CarTransmissionType
+end
+go
+--exec [46009966].GetTransmission
+drop proc [46009966].GetTransmission
+create proc [46009966].GetAllCars
+as begin
+select * from [46009966].[Car]
+end
+go
+exec [46009966].GetAllCars
+drop proc [46009966].GetAllCars
+
+create proc [46009966].DeleteCar
+@Model varchar(50)
+AS
+BEGIN
+	delete [46009966].[Car] where Model = @Model
+END
+GO
+drop proc  [46009966].DeleteCar
+
+create proc [46009966].UpdateCar
+ @Id int,
+ @Model varchar(50),
+  @ManufacturerId VARCHAR(10),
+  @TypeId int,
+  @Engine varchar(50),
+  @BHP int,
+  @TransmissionId int,
+  @Mileage int,
+  @Seat int,
+  @AirBag varchar(20),
+  @BootSpace varchar(20),
+  @Price varchar(20)
+AS
+BEGIN
+	update [46009966].[Car] set Model = @Model,ManufacturerId = @ManufacturerId, TypeId = @TypeId,
+	Engine = @Engine,BHP = @BHP,TransmissionId = @TransmissionId,Mileage = @Mileage,
+	Seat = @Seat,AirBagDetails =@AirBag , BootSpace = @BootSpace,Price = @Price
+	  where Model = @Model
+END
+GO
+drop proc [46009966].UpdateCar
+drop proc [46009966].SearchCar
+create proc [46009966].SearchCar
+ @Id int output,
+ @Model varchar(50) ,
+  @ManufacturerId VARCHAR(10) output,
+  @TypeId int output,
+  @Engine varchar(50) output,
+  @BHP int output,
+  @TransmissionId int output,
+  @Mileage int output,
+  @Seat int output,
+  @AirBag varchar(20) output,
+  @BootSpace varchar(20) output,
+  @Price varchar(20) output
+AS
+BEGIN
+	select   @Id= Id,@Model = Model ,@ManufacturerId = ManufacturerId ,  @TypeId = TypeId ,
+	 @Engine = Engine , @BHP =BHP ,  @TransmissionId = TransmissionId,  @Mileage =Mileage,
+	@Seat = Seat , @AirBag = AirBagDetails,  @BootSpace = BootSpace,  @Price = Price
+	from [46009966].Car where Model = @Model
+END
+GO
+
+drop proc [46009966].SearchCar
+
+create procedure [46009966].[ManufacturerDetails]
+  @Id int,
+@Name varchar(50) ,
+@ContactPerson   varchar(50) ,
+@RegisteredOffice  varchar(50)
+as
+begin
+ Insert into [46009966].Manufacturer(Name,ContactPerson,RegisteredOffice) values(  @Name , @ContactPerson, @RegisteredOffice )
+ SET @Id= SCOPE_IDENTITY()
+ end
+
+ drop proc [46009966].[ManufacturerDetails]
+
+ select * from [46009966].Manufacturer;
+ drop table [46009966].Manufacturer
+ insert into [46009966].Manufacturer values('Audi','Kiran','Pune')
+ insert into [46009966].Manufacturer values('BMW','Raj','Mumbai')
+ insert into [46009966].Manufacturer values('Benz','Srikanth','Hyderabad')
+ insert into [46009966].Manufacturer values('Hyundai','Suresh','Bangalore')
+ insert into [46009966].Manufacturer values('Suzuki','Ramesh','Chennai')
+  insert into [46009966].Manufacturer values('Volkswagon','Karthik','Vijayawada')
+
+  select * from [46009966].CarType;
+ insert into [46009966].CarType values ('HatchBack');
+ insert into [46009966].CarType values ('Sedan');
+ insert into [46009966].CarType values ('SUV');
+
+ select * from [46009966].CarTransmissionType;
+ insert into [46009966].CarTransmissionType values('Automatic');
+ insert into [46009966].CarTransmissionType values('Manual');
+
+
+
+
+ create proc [46009966].usp_SearchRegister
+(
+@username varchar(20),
+@pass varchar(20)
+)
+as
+begin
+    if exists (select UserName from [46009966].Register where UserName = @username)
+    begin
+        select * from [46009966].Register where UserName=@username and Password=@pass
+    end
+    else
+    begin
+        raiserror('Account does not exists', 1,1)
+    end
+end
+
+drop proc [46009966].usp_SearchRegister
+
+--exec [46009966].usp_SearchRegister 'js','sowrya'
+
+exec [46009966].usp_SearchRegister 'Teja','Teja000' 
+
+ create table [46009966].Register(
+UserName varchar(20),
+Email varchar(50),
+MobileNo varchar(10),
+Password varchar(20),
+ConfirmPassword varchar(20)
+)
+
+select * from [46009966].Register
+
+insert into [46009966].Register values('Teja','Tejaswini.Kalapala@gmail.com','7396159678','Teja000','Teja000')
+-- Name varchar(50) unique,
+--ContactPerson varchar(50) unique,
+--RegisteredOffice varchar(50) not null);
+
+create proc [dbo].[usp_seas](
+
+@Model varchar(50) )
+as 
+select * from [46009966].Car where (Model=@Model)
+
+exec [dbo].[usp_seas] 'K10'
+
+create proc [46009966].SearchCars
+ @Id int output,
+ @Model varchar(50) ,
+  @ManufacturerId VARCHAR(10) output,
+  @TypeId int output,
+  @Engine varchar(50) output,
+  @BHP int output,
+  @TransmissionId int output,
+  @Mileage int output,
+  @Seat int output,
+  @AirBag varchar(20) output,
+  @BootSpace varchar(20) output,
+  @Price varchar(20) output
+AS
+    Begin
+    
+if exists (select Model from [46009966].Car where Model=@model)
+	select   @Id=Id,@Model = Model ,@ManufacturerId = ManufacturerId ,  @TypeId = TypeId ,
+	 @Engine = Engine , @BHP =BHP ,  @TransmissionId = TransmissionId,  @Mileage =Mileage,
+	@Seat = Seat , @AirBag = AirBagDetails,  @BootSpace = BootSpace,  @Price = Price
+	from [46009966].Car where Model = @Model
+	
+else
+begin
+      raiserror('Car Details are not available',1,1)
+end
+    END
+GO
+exec [46009966].SearchCars 'K10',1,1,'4.6L',78,1,56,4,'Driver','400 litres',100000
+
+CREATE SEQUENCE  ManfId AS INT
+ START WITH 1
+ INCREMENT BY 1
+GO
+create procedure [46009966].usp_ManfInsert
+(
+@ManufacturerName varchar(50),
+	@ContactPerson varchar(50),
+	@RegisteredOffice varchar(50))
+	As
+	begin
+insert into  [46009966].Manufacturer values (next value for ManfId,@ManufacturerName,@ContactPerson,@RegisteredOffice)
+end
+
+exec [46009966].usp_ManfInsert 'Ttt','Man','Pune'
